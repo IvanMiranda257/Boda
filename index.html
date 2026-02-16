@@ -18,6 +18,135 @@
             overflow-x: hidden;
         }
 
+        /* MODAL DE MÚSICA */
+        .music-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .music-modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .music-modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f5f2 100%);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: modalAppear 0.5s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .music-modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .music-modal h2 {
+            color: #8b5a5a;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .music-modal p {
+            color: #5a4a42;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .music-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .music-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .music-btn-yes {
+            background: #8b5a5a;
+            color: white;
+        }
+
+        .music-btn-yes:hover {
+            background: #6b4444;
+            transform: translateY(-2px);
+        }
+
+        .music-btn-no {
+            background: #e0d5d0;
+            color: #5a4a42;
+        }
+
+        .music-btn-no:hover {
+            background: #d0c5c0;
+            transform: translateY(-2px);
+        }
+
+        /* BOTÓN FLOTANTE DE MÚSICA */
+        .music-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: #8b5a5a;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: all 0.3s;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.1);
+            background: #6b4444;
+        }
+
+        .music-toggle.hidden {
+            display: none;
+        }
+
         .hero {
             min-height: 100vh;
             background: linear-gradient(135deg, #8b5a5a 0%, #6b4444 100%);
@@ -337,6 +466,29 @@
     </style>
 </head>
 <body>
+    <!-- MODAL DE MÚSICA -->
+    <div class="music-modal" id="musicModal">
+        <div class="music-modal-content">
+            <div class="music-modal-icon">🎵</div>
+            <h2>Bienvenidos a nuestra boda</h2>
+            <p>La música de fondo es parte de la experiencia.<br>¿Deseas continuar con música?</p>
+            <div class="music-modal-buttons">
+                <button class="music-btn music-btn-yes" onclick="startWithMusic()">Sí, con música</button>
+                <button class="music-btn music-btn-no" onclick="startWithoutMusic()">No, gracias</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN FLOTANTE PARA CONTROLAR MÚSICA -->
+    <div class="music-toggle hidden" id="musicToggle" onclick="toggleMusic()">
+        <span id="musicIcon">🔇</span>
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="backgroundMusic" loop>
+        <source src="musica.mp3" type="audio/mpeg">
+    </audio>
+
     <div class="hero">
         <div class="welcome-text">BIENVENIDOS A LA BODA DE</div>
         <div class="names-container">
@@ -470,6 +622,42 @@
     </div>
 
     <script>
+        // Control de música
+        const musicModal = document.getElementById('musicModal');
+        const musicToggle = document.getElementById('musicToggle');
+        const musicIcon = document.getElementById('musicIcon');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        let musicPlaying = false;
+
+        function startWithMusic() {
+            backgroundMusic.volume = 0.3; // Volumen al 30%
+            backgroundMusic.play();
+            musicPlaying = true;
+            musicModal.classList.add('hidden');
+            musicToggle.classList.remove('hidden');
+            musicIcon.textContent = '🔊';
+        }
+
+        function startWithoutMusic() {
+            musicModal.classList.add('hidden');
+            musicToggle.classList.remove('hidden');
+            musicIcon.textContent = '🔇';
+        }
+
+        function toggleMusic() {
+            if (musicPlaying) {
+                backgroundMusic.pause();
+                musicIcon.textContent = '🔇';
+                musicPlaying = false;
+            } else {
+                backgroundMusic.volume = 0.3;
+                backgroundMusic.play();
+                musicIcon.textContent = '🔊';
+                musicPlaying = true;
+            }
+        }
+
+        // Cuenta regresiva
         function updateCountdown() {
             const weddingDate = new Date('2026-07-25T13:30:00').getTime();
             const now = new Date().getTime();
